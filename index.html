@@ -602,38 +602,81 @@
     </section>
 
     <!-- Contact -->
-    <section id="contact">
-        <div class="container">
-            <div class="section-header">
-                <h2>Ready to Build Your System?</h2><p>Tell us about your automation challenges.</p>
-            </div>
-            <div class="glass-panel contact-wrapper">
-                    <form id="contactForm" class="contact-form">
-    <div class="form-group">
-        <input type="text" id="name" placeholder="Your Name" required>
+   <section id="contact">
+  <div class="container">
+    <div class="section-header">
+      <h2>Ready to Build Your System?</h2>
+      <p>Tell us about your automation challenges.</p>
     </div>
 
-    <div class="form-group">
-        <input type="email" id="email" placeholder="Work Email" required>
-    </div>
+    <div class="glass-panel contact-wrapper">
 
-    <div class="form-group">
-        <input type="text" id="company" placeholder="Company Name" required>
-    </div>
-
-    <div class="form-group">
-        <textarea id="message" rows="4" placeholder="What AI challenge are you solving?" required></textarea>
-    </div>
-
-    <button type="submit" class="btn btn-primary" style="width: 100%;">
-        Get Started
-    </button>
-</form>
-<p id="responseMessage" style="margin-top:10px;"></p>
-
-            </div>
+      <form id="contactForm" class="contact-form">
+        <div class="form-group">
+          <input type="text" id="name" placeholder="Your Name" required>
         </div>
-    </section>
+
+        <div class="form-group">
+          <input type="email" id="email" placeholder="Work Email" required>
+        </div>
+
+        <div class="form-group">
+          <input type="text" id="company" placeholder="Company Name" required>
+        </div>
+
+        <div class="form-group">
+          <textarea id="message" rows="4" placeholder="What AI challenge are you solving?" required></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%;">
+          Get Started
+        </button>
+      </form>
+
+      <p id="responseMessage" style="margin-top:10px;"></p>
+
+    </div>
+  </div>
+</section>
+
+<script>
+document.querySelector("#contactForm").addEventListener("submit", async function(e) {
+  e.preventDefault();
+
+  const name = document.getElementById("name").value;
+  const email = document.getElementById("email").value;
+  const company = document.getElementById("company").value;
+  const message = document.getElementById("message").value;
+  const responseMessage = document.getElementById("responseMessage");
+
+  responseMessage.innerHTML = "Submitting...";
+  responseMessage.style.color = "#aaa";
+
+  try {
+    const res = await fetch("https://linguawaves.vercel.app/api/submit-contact", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, email, company, message })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      responseMessage.innerHTML = "Form submitted successfully!";
+      responseMessage.style.color = "lightgreen";
+      document.getElementById("contactForm").reset();
+    } else {
+      responseMessage.innerHTML = "Submission failed. Try again.";
+      responseMessage.style.color = "red";
+    }
+
+  } catch (err) {
+    responseMessage.innerHTML = "Server error. Please try later.";
+    responseMessage.style.color = "red";
+  }
+});
+</script>
+
 
     <!-- Footer -->
     <footer>
@@ -814,4 +857,5 @@ document.getElementById("contactForm").addEventListener("submit", async function
 </body>
 
 </html>
+
 
