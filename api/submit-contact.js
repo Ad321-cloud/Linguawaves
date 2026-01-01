@@ -1,106 +1,24 @@
-/**
- * Contact Submission → Supabase Storage
- * Secure • Netlify Free Tier Compatible • Production Ready
- */
-
-export const handler = async (event) => {
-  const headers = {
-    "Access-Control-Allow-Origin": "*", // later: replace with your domain
-    "Access-Control-Allow-Headers": "Content-Type",
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
-    "Content-Type": "application/json",
-  };
-
-  if (event.httpMethod === "OPTIONS")
-    return { statusCode: 200, headers, body: "" };
-
-  if (event.httpMethod !== "POST") {
-    return {
-      statusCode: 405,
-      headers,
-      body: JSON.stringify({ status: false, error: "Use POST" }),
-    };
-  }
-
+export default async function handler(req, res) {
   try {
-    const body = JSON.parse(event.body || "{}");
-    const { name, email, message, company = null, phone = null } = body;
-
-    if (!name || !email || !message) {
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({
-          status: false,
-          error: "name, email and message are required",
-        }),
-      };
+    if (req.method === "OPTIONS") {
+      return res.status(200).json({ message: "Preflight OK" });
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({ status: false, error: "Invalid email" }),
-      };
-    }
+    const data = req.body;
 
-    // ---- Supabase (secure server key) ----
-    const { createClient } = await import("@supabase/supabase-js");
+    console.log("Received Data:", data);
 
-    const supabase = createClient(
-      process.env.SUPABASE_URL,
-      process.env.SUPABASE_SERVICE_KEY
-    );
+    return res.status(200).json({
+      success: true,
+      message: "Form submitted successfully!"
+    });
 
-    const { error } = await supabase.from("contacts").insert([
-      {
-        name,
-        email,
-        message,
-        company,
-        phone,
-        created_at: new Date().toISOString(),
-      },
-    ]);
+  } catch (error) {
+    console.error("Error:", error);
 
-    // Handles duplicate email constraint safely
-    if (error) {
-      console.error("Supabase Insert Error:", error.message);
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({
-          status: false,
-          error:
-            error.code === "23505"
-              ? "Contact already exists. We'll be in touch."
-              : "Failed to save submission",
-        }),
-      };
-    }
-
-    console.log("Contact stored:", email);
-
-    return {
-      statusCode: 200,
-      headers,
-      body: JSON.stringify({
-        status: true,
-        message: "Contact stored successfully",
-        data: { name, email, submittedAt: new Date().toISOString() },
-      }),
-    };
-  } catch (err) {
-    console.error("Submit Contact Fatal:", err);
-    return {
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({
-        status: false,
-        error: "Internal server error",
-      }),
-    };
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error"
+    });
   }
-};
+}
