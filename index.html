@@ -608,13 +608,29 @@
                 <h2>Ready to Build Your System?</h2><p>Tell us about your automation challenges.</p>
             </div>
             <div class="glass-panel contact-wrapper">
-                <form class="contact-form" onsubmit="event.preventDefault(); alert('Thank you! This is a demo form.');">
-                    <div class="form-group"><input type="text" placeholder="Your Name" required></div>
-                    <div class="form-group"><input type="email" placeholder="Work Email" required></div>
-                    <div class="form-group"><input type="text" placeholder="Company Name" required></div>
-                    <div class="form-group"><textarea rows="4" placeholder="What AI challenge are you solving?" required></textarea></div>
-                    <button type="submit" class="btn btn-primary" style="width: 100%;">Get Started</button>
-                </form>
+                    <form id="contactForm" class="contact-form">
+    <div class="form-group">
+        <input type="text" id="name" placeholder="Your Name" required>
+    </div>
+
+    <div class="form-group">
+        <input type="email" id="email" placeholder="Work Email" required>
+    </div>
+
+    <div class="form-group">
+        <input type="text" id="company" placeholder="Company Name" required>
+    </div>
+
+    <div class="form-group">
+        <textarea id="message" rows="4" placeholder="What AI challenge are you solving?" required></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary" style="width: 100%;">
+        Get Started
+    </button>
+</form>
+<p id="responseMessage" style="margin-top:10px;"></p>
+
             </div>
         </div>
     </section>
@@ -758,7 +774,44 @@
         function closeModal() { modal.classList.remove('active'); }
         modal.addEventListener('click', (e) => { if (e.target === modal || e.target.classList.contains('close-modal')) closeModal(); });
         renderCaseStudy('manufacturing');
-    </script>
+        <script>
+document.getElementById("contactForm").addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    const name = document.getElementById("name").value;
+    const email = document.getElementById("email").value;
+    const company = document.getElementById("company").value;
+    const message = document.getElementById("message").value;
+
+    document.getElementById("responseMessage").innerHTML = "Submitting...";
+
+    try {
+        const res = await fetch("https://linguawaves.vercel.app/api/submit-contact", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                name,
+                email,
+                company,
+                message
+            })
+        });
+
+        const data = await res.json();
+
+        document.getElementById("responseMessage").innerHTML =
+            data?.message || "Form submitted successfully!";
+    } 
+    catch (error) {
+        document.getElementById("responseMessage").innerHTML =
+            "Something went wrong. Please try again.";
+        console.error(error);
+    }
+});
+</script>
 </body>
 
 </html>
+
