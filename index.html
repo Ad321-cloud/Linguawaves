@@ -812,7 +812,7 @@
             };
 
             try {
-                const res = await fetch("https://linguawaves.vercel.app/api/submit-contact", {
+                const res = await fetch("/api/submit-contact", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
@@ -843,3 +843,4 @@
     </script>
 </body>
 </html>
+
