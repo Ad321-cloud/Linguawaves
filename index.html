@@ -475,6 +475,7 @@
                 <a href="#solutions" class="nav-link">Solutions</a>
                 <a href="#tech-stack" class="nav-link">Technology</a> 
                 <a href="#case-studies" class="nav-link">Case Studies</a>
+                <a href="#careers" class="nav-link">Careers</a>
                 <a href="#about" class="nav-link">About</a>
                 <a href="#contact" class="nav-link nav-cta">Book a Call</a>
             </div>
@@ -601,6 +602,46 @@
         </div>
     </section>
 
+    <!-- Careers -->
+    <section id="careers">
+        <div class="container">
+            <div class="section-header">
+                <h2>Join Our Team</h2>
+                <p>We're looking for visionary thinkers to build the future of AI automation.</p>
+            </div>
+
+            <div class="glass-panel contact-wrapper">
+                <form id="careerForm" class="contact-form">
+                    <div class="form-group">
+                        <input type="text" id="careerName" placeholder="Full Name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="email" id="careerEmail" placeholder="Email Address" required>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="text" id="careerRole" placeholder="Role of Interest (e.g. AI Engineer, Sales, Ops)" required>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="url" id="careerLinkedIn" placeholder="LinkedIn or Portfolio URL" required>
+                    </div>
+
+                    <div class="form-group">
+                        <textarea id="careerMessage" rows="4" placeholder="Tell us why you'd like to join Linguawaves" required></textarea>
+                    </div>
+
+                    <button type="submit" id="careerSubmitBtn" class="btn btn-primary" style="width: 100%;">
+                        Submit Application
+                    </button>
+                </form>
+
+                <p id="careerResponseMessage" style="margin-top:10px; text-align: center; font-weight: 500;"></p>
+            </div>
+        </div>
+    </section>
+
     <!-- Contact -->
     <section id="contact">
         <div class="container">
@@ -647,7 +688,7 @@
                     <p style="margin-top: 15px; color: var(--text-dim); font-size: 14px; max-width: 300px;">Architecting the future of business with AI agents and automation infrastructure.</p>
                 </div>
                 <div class="footer-col">
-                    <h4>Company</h4><ul><li><a href="#about">About Founder</a></li><li><a href="#solutions">Solutions</a></li><li><a href="#case-studies">Case Studies</a></li><li><a href="#tech-stack">Technology</a></li></ul>
+                    <h4>Company</h4><ul><li><a href="#about">About Founder</a></li><li><a href="#solutions">Solutions</a></li><li><a href="#careers">Careers</a></li><li><a href="#case-studies">Case Studies</a></li><li><a href="#tech-stack">Technology</a></li></ul>
                 </div>
                 <div class="footer-col">
                     <h4>Connect</h4><ul><li><a href="https://www.linkedin.com/in/aditya-singh-lw">LinkedIn</a></li><li><a href="mailto:aditya@linguawaves.com">aditya@linguawaves.com</a></li><li><a href="#contact">Book a Call</a></li></ul>
@@ -788,6 +829,55 @@
         function closeModal() { modal.classList.remove('active'); }
         modal.addEventListener('click', (e) => { if (e.target === modal || e.target.classList.contains('close-modal')) closeModal(); });
         
+        // Career Form Logic
+        document.getElementById("careerForm").addEventListener("submit", async function(e) {
+            e.preventDefault();
+
+            const submitBtn = document.getElementById("careerSubmitBtn");
+            const responseMessage = document.getElementById("careerResponseMessage");
+            const originalBtnText = submitBtn.innerText;
+
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Submitting...";
+            responseMessage.innerText = "";
+
+            const formData = {
+                name: document.getElementById("careerName").value,
+                email: document.getElementById("careerEmail").value,
+                role: document.getElementById("careerRole").value,
+                linkedin: document.getElementById("careerLinkedIn").value,
+                message: document.getElementById("careerMessage").value
+            };
+
+            try {
+                const res = await fetch("/api/submit-application", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    responseMessage.style.color = "#4ade80";
+                    responseMessage.innerText = "Application submitted! We'll review and get back to you.";
+                    document.getElementById("careerForm").reset();
+                } else {
+                    throw new Error(data?.message || "Submission failed");
+                }
+            } 
+            catch (error) {
+                console.error(error);
+                responseMessage.style.color = "#f87171";
+                responseMessage.innerText = "Something went wrong. Please try again.";
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerText = originalBtnText;
+            }
+        });
+
         // Initialize Default Tab
         renderCaseStudy('manufacturing');
 
